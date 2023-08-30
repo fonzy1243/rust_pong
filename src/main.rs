@@ -10,7 +10,14 @@ const BALL_SIZE: (f32, f32) = (8., 8.);
 // define paddle size (width x height)
 const PADDLE_SIZE: (f32, f32) = (8., 45.);
 
+// define paddle offset from screen side
+const PADDLE_OFFSET: f32 = 75.;
+
+// define paddle speed
 const PADDLE_SPEED: f32 = 2.5;
+
+// target fps for physics
+const TARGET_FPS: u32 = 165;
 
 fn main() -> GameResult {
     let (ctx, event_loop) = ContextBuilder::new("Pong", "fonzy")
@@ -48,13 +55,13 @@ impl Player {
     fn new(side: PlayerSide) -> Self {
         let paddle = match side {
             PlayerSide::Left => ggez::graphics::Rect::new(
-                0. + 75.,
+                0. + PADDLE_OFFSET,
                 SCREEN_SIZE.1 / 2. - PADDLE_SIZE.1 / 2.,
                 PADDLE_SIZE.0,
                 PADDLE_SIZE.1,
             ),
             PlayerSide::Right => ggez::graphics::Rect::new(
-                SCREEN_SIZE.0 - 75. - PADDLE_SIZE.0,
+                SCREEN_SIZE.0 - PADDLE_OFFSET - PADDLE_SIZE.0,
                 SCREEN_SIZE.1 / 2. - PADDLE_SIZE.1 / 2.,
                 PADDLE_SIZE.0,
                 PADDLE_SIZE.1,
@@ -144,7 +151,7 @@ impl State {
 
 impl ggez::event::EventHandler<GameError> for State {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
-        while ctx.time.check_update_time(165) {
+        while ctx.time.check_update_time(TARGET_FPS) {
             if self.is_finished {
                 ctx.request_quit();
             }
