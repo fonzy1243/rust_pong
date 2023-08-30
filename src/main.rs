@@ -10,6 +10,8 @@ const BALL_SIZE: (f32, f32) = (8., 8.);
 // define paddle size (width x height)
 const PADDLE_SIZE: (f32, f32) = (8., 45.);
 
+const PADDLE_SPEED: f32 = 2.5;
+
 fn main() -> GameResult {
     let (ctx, event_loop) = ContextBuilder::new("Pong", "fonzy")
         .window_setup(ggez::conf::WindowSetup::default().title("Pong").vsync(true))
@@ -79,14 +81,14 @@ impl Player {
         match self.direction {
             Direction::Up => {
                 if self.paddle.y > 0. {
-                    self.paddle.y -= 2.5
+                    self.paddle.y -= PADDLE_SPEED
                 } else {
                     self.paddle.y = 0.
                 }
             }
             Direction::Down => {
                 if self.paddle.y < SCREEN_SIZE.1 - PADDLE_SIZE.1 {
-                    self.paddle.y += 2.5
+                    self.paddle.y += PADDLE_SPEED
                 } else {
                     self.paddle.y = SCREEN_SIZE.1 - PADDLE_SIZE.1
                 }
