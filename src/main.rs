@@ -1,3 +1,4 @@
+use ggez::graphics::Drawable;
 use ggez::input::keyboard::KeyCode;
 use ggez::*;
 use rand::prelude::*;
@@ -23,6 +24,8 @@ const TARGET_FPS: u32 = 165;
 
 // define default horizontal ball velocity
 const BALL_X_VEL: f32 = 1.5;
+
+const SCORE_POS: ggez::glam::Vec2 = ggez::glam::Vec2::new(SCREEN_SIZE.0 / 2., 100.);
 
 fn main() -> GameResult {
     let (ctx, event_loop) = ContextBuilder::new("Pong", "fonzy")
@@ -51,7 +54,7 @@ enum PlayerSide {
 struct Player {
     paddle: ggez::graphics::Rect,
     direction: Direction,
-    pub score: u32,
+    score: u32,
 }
 
 impl Player {
@@ -146,7 +149,7 @@ impl Ball {
 
         if self.ball.x <= 0. {
             // update player 1 score
-            players.0.score += 1;
+            players.1.score += 1;
 
             self.ball.x = SCREEN_SIZE.0 / 2. + BALL_SIZE.0 / 2.;
             self.ball.y = SCREEN_SIZE.1 / 2. - BALL_SIZE.1 / 2.;
@@ -156,7 +159,7 @@ impl Ball {
 
             self.velocity = ggez::glam::Vec2::new(-BALL_X_VEL, rand_y);
         } else if self.ball.x >= SCREEN_SIZE.0 - BALL_SIZE.0 {
-            players.1.score += 1;
+            players.0.score += 1;
 
             self.ball.x = SCREEN_SIZE.0 / 2. + BALL_SIZE.0 / 2.;
             self.ball.y = SCREEN_SIZE.1 / 2. - BALL_SIZE.1 / 2.;
@@ -248,6 +251,20 @@ impl ggez::event::EventHandler<GameError> for State {
         self.player1.draw(&mut canvas);
         self.player2.draw(&mut canvas);
         self.ball.draw(&mut canvas);
+
+        let score_text = ggez::graphics::Text::new(format!(
+            "{}       {}",
+            self.player1.score, self.player2.score
+        ));
+
+        let mut score_pos = SCORE_POS;
+        let score_w = score_text
+            .dimensions(ctx)
+            .expect("Cannot get text dimensions.")
+            .w;
+        score_pos.x -= score_w / 2.;
+
+        canvas.draw(&score_text, score_pos);
 
         canvas.finish(ctx)?;
         Ok(())
